@@ -3,7 +3,7 @@
 A lightweight, fun, and fully tested HTTP framework for [Bun](https://bun.sh), with a built-in router, middleware pipeline, request validation, and consistent error handling.
 
 > RiserBob is distributed under the [MIT License](#license).
-
+![RiserBob](https://res.cloudinary.com/dgagbheuj/image/upload/v1792690158/yktnlpmjns4rwycciixn.png)
 ## Features
 
 - **Fast routing** with static and dynamic (`/users/:id`) routes, where static routes win over dynamic ones.
