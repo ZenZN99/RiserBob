@@ -1,0 +1,58 @@
+{
+	"name": "riser-bob",
+	"version": "1.0.0",
+	"description": "A TypeScript backend framework built for Bun",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"bin": {
+		"riser-bob": "./dist/cli.js"
+	},
+	"scripts": {
+		"dev": "bun run --watch src/index.ts",
+		"build": "bun run build:framework && bun run build:types && bun run build:cli",
+		"build:framework": "bun build src/index.ts --outdir dist --target bun --minify",
+		"build:cli": "bun build cli/index.ts --outfile dist/cli.js --target bun --minify",
+		"build:types": "tsc -p tsconfig.build.json",
+		"start": "bun run src/index.ts",
+		"typecheck": "tsc --noEmit",
+		"lint": "eslint test/",
+		"lint:fix": "eslint test/ --fix"
+	},
+	"keywords": [
+		"riser-bob",
+		"bun",
+		"typescript",
+		"backend",
+		"framework",
+		"cli"
+	],
+	"license": "MIT",
+	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"@types/bun": "^1.4.3",
+		"eslint": "^10.13.0",
+		"globals": "^17.13.0",
+		"jiti": "^2.7.0",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.71.2"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@riser-bob/cookie": "0.1.1"
+	}
+}

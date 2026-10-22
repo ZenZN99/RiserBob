@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Tests
+**/*.test.ts
+**/*.spec.ts
+tests/
+__tests__/
+
+# Development files
+tsconfig.json
+bun.lock
+bun.lockb
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# Coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

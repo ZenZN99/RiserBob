@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+**/!.env.example
+
+# Development files
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+bun-debug.log*
+
+# Tests and coverage
+coverage/
+.nyc_output/
+**/*.test.ts
+**/*.spec.ts
+**/__tests__/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Temporary files
+tmp/
+temp/
+.cache/
+.turbo/
+
+# Local configuration
+*.local
