@@ -1,4 +1,4 @@
-# 🧽 RiserBob
+# <img src="https://res.cloudinary.com/dgagbheuj/image/upload/v1792601028/riserbob/covers/keps4sy2lumzdx0ho23i.png" alt="RiserBob Logo" width="40" align="center" /> RiserBob
 
 A lightweight, fun, and fully tested HTTP framework for [Bun](https://bun.sh), with a built-in router, middleware pipeline, request validation, and consistent error handling.
 
