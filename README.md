@@ -11,13 +11,17 @@ A lightweight, fun, and fully tested HTTP framework for [Bun](https://bun.sh), w
 
 ## Features
 
-- **Fast routing** with static and dynamic (`/users/:id`) routes, where static routes win over dynamic ones.
-- **Middleware pipeline** with global and per-route middleware, executed in registration order.
-- **Built-in auth middleware** for Bearer-token authentication with your own token verifier.
-- **Validator** with a simple rule syntax (`required`, `string`, `email`, `min:18`, ...).
-- **Response helpers** for JSON, status codes, headers, and redirects.
-- **Consistent errors** through `HttpError` and a central error handler (`404`, `405` with the `Allow` header, `500`).
-- **Fully tested** with Bun's test runner (unit and end-to-end tests).
+- **Modular Structure** — Organize your application into clean, reusable modules that keep your codebase structured and easy to maintain.
+
+- **Ready-to-Use Middleware** — Protect routes and handle common request workflows with built-in middleware, without reinventing the wheel.
+
+- **Blazing-Fast Performance** — Built for Bun and TypeScript, with a lightweight HTTP core designed for performance.
+
+- **Built-in Validation** — Validate incoming data with a simple, developer-friendly API without building validation logic from scratch.
+
+- **Integrated CLI** — Generate modules in seconds with commands like `bun run riser-bob g module users` and keep your development workflow moving.
+
+- **Fun Sponge Zone** — Enjoy playful, SpongeBob-inspired messages and error responses that make debugging more enjoyable.
 
 ## Requirements
 
