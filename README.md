@@ -3,7 +3,7 @@
   RiserBob
 </h1>
 
-A lightweight, fun, and fully tested HTTP framework for [Bun](https://bun.sh), with a built-in router, middleware pipeline, request validation, and consistent error handling.
+A fun HTTP framework powered by Bun and TypeScript, bringing simplicity and enjoyment to backend development. Stay in the Sponge Zone!
 
 > RiserBob is distributed under the [MIT License](#license).
 
