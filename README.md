@@ -237,4 +237,14 @@ RiserBob is released under the **MIT License**. In short:
 
 See the [LICENSE](LICENSE) file for the full terms.
 
-Copyright (c) 2026 RiserBob
+Copyright (c) 2026 Zen Allaham — RiserBob
+
+---
+
+<p align="center">
+  <img
+    src="https://res.cloudinary.com/dgagbheuj/image/upload/v1792769341/ob3ejwt32h6dtfhxg1kh.png"
+    alt="RiserBob — Build APIs. Stay in the Sponge Zone."
+    width="100%"
+  />
+</p>
