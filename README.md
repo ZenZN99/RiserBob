@@ -3,7 +3,8 @@
   RiserBob
 </h1>
 
-A fun HTTP framework powered by Bun and TypeScript, bringing simplicity and enjoyment to backend development. Stay in the Sponge Zone!
+A fun and fast framework powered by Bun and TypeScript, bringing simplicity and a fresh perspective to backend development.
+Stay in the Sponge Zone!
 
 > RiserBob is distributed under the [MIT License](#license).
 
