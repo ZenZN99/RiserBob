@@ -79,9 +79,6 @@ Generate a complete module (`users.controller.ts`, `users.route.ts`, `users.modu
 ```bash
 bun run riser-bob g module users   # `generate` also works
 ```
-
-Files are created in `src/modules/<name>/` with routes under `/api/<name>`. Existing files are never overwritten. Run `riser-bob --help` for usage.
-
 ## Learn more
 
 Docs and examples: **[riserbob.vercel.app](https://riserbob.vercel.app)**. Contributions are welcome ([CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)); report vulnerabilities privately ([SECURITY.md](SECURITY.md)).
