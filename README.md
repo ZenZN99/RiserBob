@@ -8,7 +8,7 @@ Stay in the Sponge Zone!
 
 > RiserBob is distributed under the [MIT License](#license).
 
-![RiserBob](https://res.cloudinary.com/dgagbheuj/image/upload/v1792690158/yktnlpmjns4rwycciixn.png)
+![RiserBob](https://res.cloudinary.com/dgagbheuj/image/upload/v1792927501/qlflwqvq6xqgxnbn0puk.png)
 
 ## Features
 
