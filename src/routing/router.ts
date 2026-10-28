@@ -1,16 +1,17 @@
+import type { ErrorMessages } from '../errors/errors-messages'
 import type { SpongHandler } from '../types/spong-handler'
 import { SpongMethod, type HttpMethod } from '../types/spong-method'
 
 export class Router {
 	private routes = new Map<string, SpongHandler>()
 
+	constructor(private readonly errorMessages: ErrorMessages) {}
+
 	register(method: HttpMethod, path: string, handler: SpongHandler): this {
 		const key = `${method} ${path}`
 
 		if (this.routes.has(key)) {
-			throw new Error(
-				`🍍 Oh, barnacles! Route "${key}" already lives in Bikini Bottom! 🧽`
-			)
+			throw new Error(this.errorMessages.duplicateRoute(key))
 		}
 
 		this.routes.set(key, handler)

@@ -17,7 +17,8 @@ export type { SpongMethod } from './types/spong-method'
 export type { SpongMiddleware } from './types/spong-middleware'
 export type { SpongRequest } from './types/spong-request'
 export type { SpongResponse } from './types/spong-response'
+export type { SpongNext } from './types/spong-middleware'
 
 // validation
 export type { ValidationSchema } from './validation/validator'
-export  { Validator } from './validation/validator'
+export { Validator } from './validation/validator'

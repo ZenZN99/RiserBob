@@ -6,10 +6,22 @@ import type { SpongMiddleware } from '../types/spong-middleware'
 import { MiddlewarePipeline } from '../middleware/middleware-pipeline'
 import { HttpServer } from '../server/http-server'
 import { HttpError } from '../errors/http-error'
+import type { RiserBobOptions } from '../types/riser-bob-options'
+import { ErrorMessages } from '../errors/errors-messages'
+import { Server as SocketIOServer } from 'socket.io'
+import type { ServerOptions } from 'socket.io'
+import { Server as BunSocketEngine } from '@socket.io/bun-engine'
+import type { SocketIOIntegration } from '../types/socket-io-integration'
 
 export class RiserBob {
-	private readonly router = new Router()
+	private readonly router: Router
 	private readonly middlewares: SpongMiddleware<SpongRequest>[] = []
+	private readonly errorMessages: ErrorMessages
+	private socketIO?: SocketIOIntegration
+	constructor(options: RiserBobOptions = {}) {
+		this.errorMessages = new ErrorMessages(options.funnyMode ?? true)
+		this.router = new Router(this.errorMessages)
+	}
 
 	private register(
 		method: HttpMethod,
@@ -18,9 +30,7 @@ export class RiserBob {
 		...middlewares: SpongMiddleware<SpongRequest>[]
 	): this {
 		if (!path.startsWith('/')) {
-			throw new Error(
-				`🧽 Oh, barnacles! "${path}" must start with "/"! 🍍`
-			)
+			throw new Error(this.errorMessages.invalidPath(path))
 		}
 
 		const pipeline = new MiddlewarePipeline<SpongRequest>()
@@ -45,7 +55,7 @@ export class RiserBob {
 					}
 
 					console.error(
-						'[RiserBob] 🧽 Oh, barnacles! Handler did not return a Response! 🍍'
+						this.errorMessages.handlerDidNotReturnResponse()
 					)
 
 					throw new HttpError(500, 'Handler did not send a response')
@@ -119,7 +129,37 @@ export class RiserBob {
 		return this
 	}
 
+	spongSocketIO(options: Partial<ServerOptions> = {}): SocketIOServer {
+		if (this.socketIO) {
+			return this.socketIO.io
+		}
+
+		const path = options.path ?? '/socket.io/'
+
+		const engine = new BunSocketEngine({ path })
+		const io = new SocketIOServer({
+			...options,
+			path
+		})
+
+		io.bind(engine)
+
+		this.socketIO = {
+			io,
+			engine,
+			path
+		}
+
+		return io
+	}
+
 	spongListen(port = 4000, callback?: () => void) {
-		return HttpServer(this.router, port, callback)
+		return HttpServer(
+			this.router,
+			this.errorMessages,
+			port,
+			callback,
+			this.socketIO
+		)
 	}
 }

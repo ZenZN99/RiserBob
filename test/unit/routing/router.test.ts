@@ -2,6 +2,11 @@ import { describe, expect, test } from 'bun:test'
 import type { SpongHandler } from '../../../src/types/spong-handler'
 import { Router } from '../../../src/routing/router'
 import { SpongMethod } from '../../../src/types/spong-method'
+import { ErrorMessages } from '../../../src/errors/errors-messages'
+
+const errorMessages = new ErrorMessages()
+
+const createRouter = (): Router => new Router(errorMessages)
 
 const createHandler = (): SpongHandler =>
 	(() => new Response('OK')) as SpongHandler
@@ -9,7 +14,7 @@ const createHandler = (): SpongHandler =>
 describe('Router', () => {
 	describe('register()', () => {
 		test('should register a route and return the router instance', () => {
-			const router = new Router()
+			const router = createRouter()
 			const handler = createHandler()
 
 			expect(router.register(SpongMethod.GET, '/users', handler)).toBe(
@@ -23,7 +28,7 @@ describe('Router', () => {
 		})
 
 		test('should register routes with different HTTP methods', () => {
-			const router = new Router()
+			const router = createRouter()
 			const getHandler = createHandler()
 			const postHandler = createHandler()
 
@@ -35,17 +40,17 @@ describe('Router', () => {
 		})
 
 		test('should throw when registering a duplicate route', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/users', createHandler())
 
 			expect(() =>
 				router.register(SpongMethod.GET, '/users', createHandler())
-			).toThrow('Route "GET /users" already lives in Bikini Bottom!')
+			).toThrow(errorMessages.duplicateRoute('GET /users'))
 		})
 
 		test('should allow the same path with different methods', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			expect(() => {
 				router.register(SpongMethod.GET, '/users', createHandler())
@@ -56,7 +61,7 @@ describe('Router', () => {
 
 	describe('match()', () => {
 		test('should match a static route', () => {
-			const router = new Router()
+			const router = createRouter()
 			const handler = createHandler()
 
 			router.register(SpongMethod.GET, '/products', handler)
@@ -68,7 +73,7 @@ describe('Router', () => {
 		})
 
 		test('should return undefined when the route does not exist', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/products', createHandler())
 
@@ -76,7 +81,7 @@ describe('Router', () => {
 		})
 
 		test('should return undefined for an unsupported method', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/products', createHandler())
 
@@ -84,7 +89,7 @@ describe('Router', () => {
 		})
 
 		test('should match a route with one dynamic parameter', () => {
-			const router = new Router()
+			const router = createRouter()
 			const handler = createHandler()
 
 			router.register(SpongMethod.GET, '/users/:id', handler)
@@ -96,7 +101,7 @@ describe('Router', () => {
 		})
 
 		test('should match multiple dynamic parameters', () => {
-			const router = new Router()
+			const router = createRouter()
 			const handler = createHandler()
 
 			router.register(
@@ -115,7 +120,7 @@ describe('Router', () => {
 		})
 
 		test('should not match when the number of path segments differs', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/users/:id', createHandler())
 
@@ -124,7 +129,7 @@ describe('Router', () => {
 		})
 
 		test('should not treat static segments as dynamic parameters', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/users/profile', createHandler())
 
@@ -132,7 +137,7 @@ describe('Router', () => {
 		})
 
 		test('should decode URL-encoded parameters', () => {
-			const router = new Router()
+			const router = createRouter()
 			const handler = createHandler()
 
 			router.register(SpongMethod.GET, '/users/:name', handler)
@@ -146,7 +151,7 @@ describe('Router', () => {
 		})
 
 		test('should return undefined for malformed URL encoding', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/users/:id', createHandler())
 
@@ -154,7 +159,7 @@ describe('Router', () => {
 		})
 
 		test('should prefer a static route over a dynamic route', () => {
-			const router = new Router()
+			const router = createRouter()
 			const dynamicHandler = createHandler()
 			const staticHandler = createHandler()
 
@@ -168,7 +173,7 @@ describe('Router', () => {
 		})
 
 		test('should match the dynamic route when no static route matches', () => {
-			const router = new Router()
+			const router = createRouter()
 			const dynamicHandler = createHandler()
 			const staticHandler = createHandler()
 
@@ -182,7 +187,7 @@ describe('Router', () => {
 		})
 
 		test('should match the root route', () => {
-			const router = new Router()
+			const router = createRouter()
 			const handler = createHandler()
 
 			router.register(SpongMethod.GET, '/', handler)
@@ -194,7 +199,7 @@ describe('Router', () => {
 		})
 
 		test('should treat trailing slashes as equivalent', () => {
-			const router = new Router()
+			const router = createRouter()
 			const handler = createHandler()
 
 			router.register(SpongMethod.GET, '/users/', handler)
@@ -206,7 +211,7 @@ describe('Router', () => {
 		})
 
 		test('should match only the exact HTTP method casing', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/users', createHandler())
 
@@ -216,7 +221,7 @@ describe('Router', () => {
 
 	describe('allowedMethods()', () => {
 		test('should return the methods registered for a path', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/users', createHandler())
 			router.register(SpongMethod.POST, '/users', createHandler())
@@ -230,13 +235,13 @@ describe('Router', () => {
 		})
 
 		test('should return an empty array when no methods are registered', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			expect(router.allowedMethods('/missing')).toEqual([])
 		})
 
 		test('should return only methods registered for the exact path', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.GET, '/users', createHandler())
 			router.register(SpongMethod.POST, '/users/:id', createHandler())
@@ -245,7 +250,7 @@ describe('Router', () => {
 		})
 
 		test('should return methods in the configured order', () => {
-			const router = new Router()
+			const router = createRouter()
 
 			router.register(SpongMethod.DELETE, '/products', createHandler())
 			router.register(SpongMethod.PATCH, '/products', createHandler())

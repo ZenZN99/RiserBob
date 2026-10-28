@@ -14,10 +14,24 @@ type TokenVerifier = (
 
 export type AuthMode = 'cookie' | 'bearer' | 'both'
 
-export interface AuthMiddlewareOptions {
-	mode?: AuthMode
+type CookieAuthOptions = {
+	mode: 'cookie'
+	cookieName: string
+}
+
+type BearerAuthOptions = {
+	mode: 'bearer'
+}
+
+type BothAuthOptions = {
+	mode: 'both'
 	cookieName?: string
 }
+
+export type AuthMiddlewareOptions =
+	| CookieAuthOptions
+	| BearerAuthOptions
+	| BothAuthOptions
 
 export class AuthMiddleware {
 	private readonly mode: AuthMode
@@ -25,10 +39,13 @@ export class AuthMiddleware {
 
 	constructor(
 		private readonly verifyToken: TokenVerifier,
-		options: AuthMiddlewareOptions = {}
+		options: AuthMiddlewareOptions = { mode: 'both' }
 	) {
-		this.mode = options.mode ?? 'both'
-		this.cookieName = options.cookieName ?? 'token'
+		this.mode = options.mode
+		this.cookieName =
+			options.mode === 'cookie' || options.mode === 'both'
+				? (options.cookieName ?? 'token')
+				: 'token'
 	}
 
 	private getToken(spongReq: SpongRequest): string | null {

@@ -1,3 +1,5 @@
+import { ErrorMessages } from '../errors/errors-messages'
+
 export type ValidationRule =
 	| 'required'
 	| 'nullable'
@@ -6,12 +8,76 @@ export type ValidationRule =
 	| 'boolean'
 	| 'email'
 	| 'confirmed'
+	| 'array'
+	| 'url'
+	| `enum:${string}`
 	| `min:${number}`
 	| `max:${number}`
 	| `minLength:${number}`
 	| `maxLength:${number}`
+	| `minItems:${number}`
+	| `maxItems:${number}`
 
-export type ValidationSchema = Record<string, ValidationRule[]>
+type BaseRule = 'required' | 'nullable'
+
+type MinItemsRule = `minItems:${number}`
+type MaxItemsRule = `maxItems:${number}`
+type MinLengthRule = `minLength:${number}`
+type MaxLengthRule = `maxLength:${number}`
+type MinRule = `min:${number}`
+type MaxRule = `max:${number}`
+
+// Optionally appends "confirmed" as the very last rule.
+type WithConfirmed<T extends readonly unknown[]> =
+	| T
+	| readonly [...T, 'confirmed']
+
+// Each limit rule may appear at most once, in any order.
+type StringRules = WithConfirmed<
+	| readonly ['string']
+	| readonly ['string', MinLengthRule]
+	| readonly ['string', MaxLengthRule]
+	| readonly ['string', MinLengthRule, MaxLengthRule]
+	| readonly ['string', MaxLengthRule, MinLengthRule]
+>
+
+type NumberRules = WithConfirmed<
+	| readonly ['number']
+	| readonly ['number', MinRule]
+	| readonly ['number', MaxRule]
+	| readonly ['number', MinRule, MaxRule]
+	| readonly ['number', MaxRule, MinRule]
+>
+
+// "email" is a specialised string type: nothing may follow it.
+type EmailRules = readonly ['email']
+
+// "url" and "enum:a,b" are final types as well: nothing may follow them.
+type UrlRules = readonly ['url']
+type EnumRules = readonly [`enum:${string}`]
+
+// "boolean" has no sub-rules: it is always the last element.
+type BooleanRules = readonly ['boolean']
+
+// array requires at least one of minItems / maxItems (each at most once).
+type ArrayRules =
+	| readonly ['array', MinItemsRule]
+	| readonly ['array', MaxItemsRule]
+	| readonly ['array', MinItemsRule, MaxItemsRule]
+	| readonly ['array', MaxItemsRule, MinItemsRule]
+
+type TypedRules =
+	| StringRules
+	| NumberRules
+	| EmailRules
+	| UrlRules
+	| EnumRules
+	| BooleanRules
+	| ArrayRules
+
+export type FieldRules = TypedRules | readonly [BaseRule, ...TypedRules]
+
+export type ValidationSchema = Record<string, FieldRules>
 
 export type ValidationErrors = Record<string, string[]>
 
@@ -29,9 +95,38 @@ export type ValidationResult<T> =
 type ParsedRule = {
 	name: string
 	limit?: number
+	options?: string[]
+}
+
+// Strict http(s) URL check: `new URL()` alone is too lenient
+// (it accepts "mailto:", "javascript:", "http:example.com", "http:///x", ...).
+type UrlCheck = 'ok' | 'invalid' | 'protocol'
+
+function checkUrl(value: string): UrlCheck {
+	if (value !== value.trim() || /\s/.test(value)) return 'invalid'
+
+	let url: URL
+	try {
+		url = new URL(value)
+	} catch {
+		return 'invalid'
+	}
+
+	if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+		return 'protocol'
+	}
+
+	// require an explicit "//" followed by a real host
+	if (!/^https?:\/\/[^/\\?#@]/i.test(value) || url.hostname === '') {
+		return 'invalid'
+	}
+
+	return 'ok'
 }
 
 const RULE_NAMES = new Set([
+	'url',
+	'enum',
 	'required',
 	'nullable',
 	'string',
@@ -39,13 +134,22 @@ const RULE_NAMES = new Set([
 	'boolean',
 	'email',
 	'confirmed',
+	'array',
 	'min',
 	'max',
 	'minLength',
-	'maxLength'
+	'maxLength',
+	'minItems',
+	'maxItems'
 ])
 
 export class Validator {
+	private static errorMessages = new ErrorMessages()
+
+	static configure(errorMessages: ErrorMessages): void {
+		this.errorMessages = errorMessages
+	}
+
 	private static parseSchema(
 		schema: ValidationSchema
 	): Record<string, ParsedRule[]> {
@@ -56,7 +160,7 @@ export class Validator {
 				throw new TypeError(`Invalid validation rules for "${field}"`)
 			}
 
-			parsed[field] = rules.map((rule) => {
+			parsed[field] = (rules as readonly ValidationRule[]).map((rule) => {
 				if (typeof rule !== 'string') {
 					throw new TypeError(
 						`Invalid validation rule for "${field}"`
@@ -70,11 +174,41 @@ export class Validator {
 					throw new TypeError(`Unknown validation rule: ${rule}`)
 				}
 
+				if (name === 'enum') {
+					if (separator === -1) {
+						throw new TypeError(
+							`Rule "enum" requires options for "${field}" (e.g. "enum:active,pending")`
+						)
+					}
+
+					// Options are split on "," only and trimmed consistently.
+					const options = rule
+						.slice(separator + 1)
+						.split(',')
+						.map((option) => option.trim())
+
+					if (options.some((option) => option === '')) {
+						throw new TypeError(
+							`Invalid enum rule for "${field}": empty option in "${rule}"`
+						)
+					}
+
+					if (new Set(options).size !== options.length) {
+						throw new TypeError(
+							`Invalid enum rule for "${field}": duplicate option in "${rule}"`
+						)
+					}
+
+					return { name, options }
+				}
+
 				const needsLimit = [
 					'min',
 					'max',
 					'minLength',
-					'maxLength'
+					'maxLength',
+					'minItems',
+					'maxItems'
 				].includes(name)
 
 				if (!needsLimit) {
@@ -103,7 +237,12 @@ export class Validator {
 					throw new TypeError(`Invalid validation limit: ${rule}`)
 				}
 
-				if (name.endsWith('Length') && !Number.isInteger(limit)) {
+				if (
+					(name.endsWith('Length') ||
+						name === 'minItems' ||
+						name === 'maxItems') &&
+					!Number.isInteger(limit)
+				) {
 					throw new TypeError(
 						`Rule "${name}" requires an integer limit`
 					)
@@ -114,12 +253,7 @@ export class Validator {
 
 			const names = parsed[field].map((rule) => rule.name)
 			if (names.includes('required') && names.includes('nullable')) {
-				console.error(
-					`[RiserBob] 🧽🍍 Oh, barnacles! Invalid Validation Schema!
-  Field: ${field}
-  💥 "required" and "nullable" cannot be combined!
-  🦑 Squidward says: "Fix your Schema already!"`
-				)
+				console.error(this.errorMessages.invalidValidationSchema(field))
 
 				throw new TypeError(
 					`[RiserBob] Invalid rules for field "${field}".`
@@ -189,6 +323,11 @@ export class Validator {
 				typeFailed = true
 			}
 
+			if (names.includes('array') && !Array.isArray(value)) {
+				addError(field, `${field} must be an array`)
+				typeFailed = true
+			}
+
 			if (typeFailed) continue
 
 			if (
@@ -197,6 +336,35 @@ export class Validator {
 					!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
 			) {
 				addError(field, `${field} must be a valid email`)
+			}
+
+			if (names.includes('url')) {
+				if (typeof value !== 'string') {
+					addError(field, `${field} must be a string`)
+				} else {
+					const check = checkUrl(value)
+
+					if (check === 'invalid') {
+						addError(field, `${field} must be a valid URL`)
+					} else if (check === 'protocol') {
+						addError(field, `${field} URL must use http or https`)
+					}
+				}
+			}
+
+			const enumRule = rules.find((rule) => rule.name === 'enum')
+
+			if (enumRule?.options !== undefined) {
+				// strict, case-sensitive comparison; no coercion to string
+				if (
+					typeof value !== 'string' ||
+					!enumRule.options.includes(value)
+				) {
+					addError(
+						field,
+						`${field} must be one of: ${enumRule.options.join(', ')}`
+					)
+				}
 			}
 
 			if (
@@ -268,6 +436,31 @@ export class Validator {
 							`${field} may not exceed ${limit} characters`
 						)
 					}
+				}
+
+				if (name === 'minItems' || name === 'maxItems') {
+					if (limit === undefined) continue
+
+					if (!Array.isArray(value)) {
+						addError(field, `${field} must be an array`)
+						continue
+					}
+
+					if (name === 'minItems' && value.length < limit) {
+						addError(
+							field,
+							`${field} must contain at least ${limit} items`
+						)
+					}
+
+					if (name === 'maxItems' && value.length > limit) {
+						addError(
+							field,
+							`${field} may not contain more than ${limit} items`
+						)
+					}
+
+					continue
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile, unlink } from 'node:fs/promises'
 import path from 'node:path'
 
 function toPascalCase(value: string): string {
@@ -16,6 +16,18 @@ function toKebabCase(value: string): string {
 		.replace(/[_\s]+/g, '-')
 }
 
+function toSingular(value: string): string {
+	if (value.endsWith('ies') && value.length > 3) {
+		return `${value.slice(0, -3)}y`
+	}
+
+	if (value.endsWith('s') && !value.endsWith('ss')) {
+		return value.slice(0, -1)
+	}
+
+	return value
+}
+
 function isValidModuleName(name: string): boolean {
 	return /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(name)
 }
@@ -29,6 +41,8 @@ export async function generateModule(name: string): Promise<void> {
 
 	const moduleName = toKebabCase(name)
 	const className = toPascalCase(moduleName)
+	const singularName = toSingular(moduleName)
+	const singularClassName = toPascalCase(singularName)
 
 	const directory = path.resolve(process.cwd(), 'src', 'modules', moduleName)
 
@@ -76,11 +90,15 @@ export class ${className}Router {
 
   register(): void {
     // Public routes
-    this.bob.spongPost("/api/${moduleName}", this.controller.create);
     this.bob.spongGet("/api/${moduleName}", this.controller.findAll);
     this.bob.spongGet("/api/${moduleName}/:id", this.controller.findOne);
 
     // Protected routes
+	this.bob.spongPost("/api/${moduleName}", 
+	this.controller.create, 
+	this.authMiddleware.middleware,
+	);
+
     this.bob.spongPut(
       "/api/${moduleName}/:id",
       this.controller.update,
@@ -118,15 +136,45 @@ export class ${className}Module {
     router.register();
   }
 }
+`,
+
+		[`schemas/${singularName}.schema.ts`]: `export class ${singularClassName}Schema {}
+`,
+		['rules/create.ts']: `import type { ValidationSchema } from "riser-bob";
+
+export const Create${singularClassName}Rule = {} satisfies ValidationSchema;
+`,
+
+		['rules/update.ts']: `import { Create${singularClassName}Rule } from "./create";
+
+export const Update${singularClassName}Rule = Create${singularClassName}Rule;
+`,
+		[`tests/${moduleName}.controller.test.ts`]: `import { describe, expect, test } from "bun:test";
+import { ${className}Controller } from "../${moduleName}.controller";
+
+describe("${className}Controller", () => {
+  const controller = new ${className}Controller();
+
+  test("should be defined", () => {
+    expect(controller).toBeDefined();
+  });
+
+  test("should expose all route handlers", () => {
+    expect(typeof controller.create).toBe("function");
+    expect(typeof controller.findAll).toBe("function");
+    expect(typeof controller.findOne).toBe("function");
+    expect(typeof controller.update).toBe("function");
+    expect(typeof controller.delete).toBe("function");
+  });
+});
 `
 	}
 
-	// Create the directory if needed.
 	await mkdir(directory, { recursive: true })
 
-	// Check all files before writing any of them.
-	for (const fileName of Object.keys(files)) {
-		const filePath = path.join(directory, fileName)
+	// Check every target before creating files.
+	for (const relativePath of Object.keys(files)) {
+		const filePath = path.join(directory, relativePath)
 
 		if (await Bun.file(filePath).exists()) {
 			throw new Error(
@@ -135,20 +183,18 @@ export class ${className}Module {
 		}
 	}
 
-	// "wx" prevents overwriting a file created between the check and write.
 	const createdFiles: string[] = []
 
 	try {
-		for (const [fileName, content] of Object.entries(files)) {
-			const filePath = path.join(directory, fileName)
+		for (const [relativePath, content] of Object.entries(files)) {
+			const filePath = path.join(directory, relativePath)
 
+			await mkdir(path.dirname(filePath), { recursive: true })
 			await writeFile(filePath, content, { flag: 'wx' })
+
 			createdFiles.push(filePath)
 		}
 	} catch (error) {
-		// Roll back files created by this run if generation fails.
-		const { unlink } = await import('node:fs/promises')
-
 		await Promise.all(
 			createdFiles.map((filePath) => unlink(filePath).catch(() => {}))
 		)
@@ -156,10 +202,13 @@ export class ${className}Module {
 		throw error
 	}
 
+	console.log('')
 	console.log(`🧽 Module "${moduleName}" generated successfully!`)
+	console.log('')
 	console.log(`📁 ${path.relative(process.cwd(), directory)}`)
+	console.log('')
 
-	for (const fileName of Object.keys(files)) {
-		console.log(`   └── ${fileName}`)
+	for (const relativePath of Object.keys(files)) {
+		console.log(`   └── ${relativePath}`)
 	}
 }

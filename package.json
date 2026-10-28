@@ -1,7 +1,7 @@
 {
 	"name": "riser-bob",
-	"version": "1.0.0",
-	"description": "A TypeScript backend framework built for Bun",
+	"version": "1.1.0",
+	"description": "A fun and fast framework powered by Bun and TypeScript, bringing simplicity and a fresh perspective to backend development. Stay in the Sponge Zone!",
 	"type": "module",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
@@ -53,6 +53,8 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
-		"@riser-bob/cookie": "0.1.1"
+		"@riser-bob/cookie": "0.1.1",
+		"@socket.io/bun-engine": "^0.1.2",
+		"socket.io": "^4.8.4"
 	}
 }

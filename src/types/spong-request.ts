@@ -1,11 +1,13 @@
 import type { SpongAuth } from './spong-auth'
 
-interface AuthenticationUser {
+export interface AuthenticationUser {
 	id: string
 	[key: string]: unknown
 }
 
-export interface SpongRequest {
+export interface SpongRequest<
+	TUser extends AuthenticationUser = AuthenticationUser
+> {
 	readonly request: Request
 	readonly method: string
 	readonly url: URL
@@ -13,8 +15,10 @@ export interface SpongRequest {
 	readonly params: Record<string, string>
 	readonly query: URLSearchParams
 	readonly headers: Headers
-	user?: AuthenticationUser
+
+	user?: TUser
 	auth?: SpongAuth
+
 	json<T = unknown>(): Promise<T>
 	formData(): ReturnType<Response['formData']>
 	text(): Promise<string>

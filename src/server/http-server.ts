@@ -1,4 +1,5 @@
 import { ErrorHandler } from '../errors/error-handler'
+import type { ErrorMessages } from '../errors/errors-messages'
 import { HttpError } from '../errors/http-error'
 import { requireJsonContentType } from '../http/content-negotiation'
 import {
@@ -7,23 +8,40 @@ import {
 } from '../http/read-request-body'
 import { RiserBobResponse } from '../http/response/riser-bob-response'
 import type { Router } from '../routing/router'
+import type { SocketIOIntegration } from '../types/socket-io-integration'
 import { SpongMethod } from '../types/spong-method'
 import type { SpongRequest } from '../types/spong-request'
 import Bun from 'bun'
 
-
-
 export const HttpServer = (
 	router: Router,
+	errorMessages: ErrorMessages,
 	port: number = 3000,
-	callback?: () => void
+	callback?: () => void,
+	socketIO?: SocketIOIntegration
 ) => {
+	const socketHandler = socketIO ? socketIO.engine.handler() : undefined
 	const server = Bun.serve({
 		port,
+		...((socketHandler && {
+			idleTimeout: 30,
+			websocket: socketHandler.websocket
+		}) as {
+			idleTimeout: number
+			websocket: NonNullable<typeof socketHandler>['websocket']
+		}),
 
 		async fetch(request): Promise<Response> {
 			try {
 				const url = new URL(request.url)
+				// Route Socket.IO requests before the HTTP router.
+				if (
+					socketIO &&
+					url.pathname.replace(/\/+$/, '') ===
+						socketIO.path.replace(/\/+$/, '')
+				) {
+					return socketIO.engine.handleRequest(request, server)
+				}
 				const origin = request.headers.get('origin')
 
 				if (request.method === SpongMethod.OPTIONS) {
@@ -57,10 +75,11 @@ export const HttpServer = (
 
 					if (allowed.length > 0) {
 						console.error(
-							`[RiserBob] 😭🧽 Method Not Allowed!\n` +
-								`Requested Method: ${request.method}\n` +
-								`Path: ${url.pathname}\n` +
-								`Allowed Methods: ${allowed.join(', ')}`
+							errorMessages.methodNotAllowed(
+								request.method,
+								url.pathname,
+								allowed
+							)
 						)
 
 						return Response.json(
@@ -75,13 +94,10 @@ export const HttpServer = (
 					}
 
 					console.warn(
-						`[RiserBob] 🧽😂 Welcome to Bikini Bottom!
-  🔎 Requested Method: ${request.method}
-  🛣️ Requested Path: ${url.pathname}
-  🤷 Route not found! Did Patrick register it?
-  🍍 SpongeBob: "I checked my pineapple, but the endpoint isn't there!"
-  🦀 Mr. Krabs: "NO ROUTE, NO MONEY!"
-  `
+						errorMessages.routeNotFound(
+							request.method,
+							url.pathname
+						)
 					)
 
 					throw new HttpError(404, 'Not Found')
@@ -161,25 +177,18 @@ export const HttpServer = (
 				}
 
 				console.error(
-					`[RiserBob] 😭🧽 Oh no! RiserBob is sad! The Handler forgot to return a valid Response! 💔
-  Method: ${request.method}
-  Path: ${url.pathname}
-  Expected: Response
-  Received: ${result === undefined ? 'undefined' : typeof result}
-  😢 RiserBob is crying in Bikini Bottom... 🍍`
+					errorMessages.handlerResponseMissing(
+						request.method,
+						url.pathname,
+						result === undefined ? 'undefined' : typeof result
+					)
 				)
+
 				return ErrorHandler.handle(
 					new Error('Handler did not send a response')
 				)
 			} catch (error) {
-				console.error(
-					`[RiserBob] 😭🧽 Oh no! RiserBob is freaking out!
-  Something went wrong while handling this request! 💥
-  RiserBob: "Who lives in a pineapple under a bug?! 😱🍍"
-  Error:`,
-					error
-				)
-
+				console.error(errorMessages.requestHandlingFailed(), error)
 				return ErrorHandler.handle(error)
 			}
 		}
