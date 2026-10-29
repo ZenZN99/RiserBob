@@ -6,6 +6,8 @@
       "name": "riser-bob",
       "dependencies": {
         "@riser-bob/cookie": "0.1.1",
+        "@socket.io/bun-engine": "^0.1.2",
+		    "socket.io": "^4.8.4"
       },
       "devDependencies": {
         "@eslint/js": "^10.0.1",
