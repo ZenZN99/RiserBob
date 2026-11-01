@@ -6,8 +6,8 @@
 
 Designed with security-conscious defaults, explicit validation, and predictable behavior, it can be used independently or alongside the RiserBob framework.
 
-[![npm version](https://img.shields.io/npm/v/@riserbob/cookie)](https://www.npmjs.com/package/@riserbob/cookie)
-[![npm downloads](https://img.shields.io/npm/dm/@riserbob/cookie)](https://www.npmjs.com/package/@riserbob/cookie)
+[![npm version](https://img.shields.io/npm/v/@riserbob/cookie)](https://www.npmjs.com/package/@riser-bob/cookie)
+[![npm downloads](https://img.shields.io/npm/dm/@riser-bob/cookie)](https://www.npmjs.com/package/@riser-bob/cookie)
 [![TypeScript](https://img.shields.io/badge/TypeScript-supported-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
