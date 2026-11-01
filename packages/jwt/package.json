@@ -1,0 +1,51 @@
+{
+  "name": "@riser-bob/jwt",
+  "version": "1.0.0",
+  "description": "Type-safe JWT access/refresh token manager for the RiserBob framework",
+  "license": "MIT",
+  "author": "Zen Allaham <zenallaham09@gmail.com> (https://zenallaham.com)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "prepublishOnly": "bun run typecheck && bun test && bun run build"
+  },
+  "keywords": [
+    "riser-bob",
+    "riserbob",
+    "jwt",
+    "auth",
+    "access-token",
+    "refresh-token"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.3"
+  },
+  "peerDependencies": {
+    "riser-bob": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.7",
+    "riser-bob": "^1.1.0",
+    "typescript": "^5.6.0"
+  }
+}
