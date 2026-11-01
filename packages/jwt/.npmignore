@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Source files
+src/
+tests/
+test/
+__tests__/
+
+# Development configuration
+AGENTS.md
+CLAUDE.md
+tsconfig.json
+tsconfig.build.json
+bunfig.toml
+
+# Development tools
+.vscode/
+.idea/
+.github/
+.editorconfig
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+bun-debug.log*
+
+# Coverage and test artifacts
+coverage/
+.nyc_output/
+
+# Build caches
+.cache/
+.turbo/
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Local development files
+*.local
+*.bak
+*.tmp
