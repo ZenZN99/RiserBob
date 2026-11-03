@@ -1,8 +1,61 @@
 # Changelog
 
-All notable changes to RiserBob are documented in this file.
+All notable changes to **RiserBob** are documented in this file.
 
 This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+For complete release details, implementation notes, examples, and upgrade instructions, see [RELEASE.md](./RELEASE.md).
+
+---
+
+## [1.1.0] - 2026-10-30
+
+<Badge>Latest Release</Badge>
+
+### Added
+
+- Expanded the validation system with `array`, `minItems`, and `maxItems` rules.
+- Added URL validation using the `url` rule.
+- Added enum validation using `enum:value1,value2,...`.
+- Added the `create-riser-bob` project generator.
+- Added Socket.IO integration through `@socket.io/bun-engine`.
+- Added `spongSocketIO()` for configuring Socket.IO.
+- Added improved module scaffolding through the CLI.
+- Added starter validation files for Create and Update operations.
+- Added a Prettier configuration to the generated project template.
+
+### Improved
+
+- Improved TypeScript validation schema typing and rule compatibility checks.
+- Improved runtime validation for arrays, URLs, and enum values.
+- Improved authentication middleware configuration for cookie-based authentication.
+- Improved CLI project creation and generated module structure.
+- Improved developer experience and framework configuration.
+- Improved HTTP framework performance, increasing benchmark results from approximately **37,000 requests per second to more than 52,000 requests per second**.
+
+### Changed
+
+- Cookie-based authentication now requires an explicit `cookieName` when using `mode: 'cookie'`.
+- Improved validation rule ordering and restrictions on incompatible combinations.
+- Updated generated project configuration and setup workflow.
+
+### Performance
+
+- Increased benchmark throughput from approximately 37K requests/second to more than 52K requests/second.
+- Represents an improvement of approximately 40% over the previous benchmark result.
+
+### Documentation
+
+- Expanded documentation for validation, authentication, CLI workflows, and Socket.IO integration.
+- Added release documentation and usage examples.
+
+### Release Details
+
+For the complete list of features, technical changes, examples, upgrade instructions, and verification notes, see:
+
+**[Read the RiserBob v1.1.0 Release Notes →](./RELEASE.md)**
+
+---
 
 ## [1.0.0] - 2026-10-22
 
@@ -10,13 +63,36 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial stable release of RiserBob.
 - TypeScript-first backend development experience powered by Bun.
+- Core HTTP framework functionality.
 - Framework components and developer tooling.
+- Modular development structure.
 - Developer-friendly error messages with RiserBob's unique personality.
 - Initial project documentation and setup instructions.
 
 ### Notes
 
 - RiserBob reaches its first stable release.
-- This release establishes the `1.0.0` baseline for future development.
+- Established the `1.0.0` baseline for future development.
 
-[1.0.0]: https://github.com/ZenZN99/RiserBob/releases/tag/v1.0.0
+**[View v1.0.0 on GitHub](https://github.com/ZenZN99/RiserBob/releases/tag/v1.0.0)**
+
+---
+
+## Release History
+
+| Version                                                          | Date       | Highlights                                                                                                                 |
+| ---------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| [1.1.0](./RELEASE.md)                                            | 2026-10-30 | Validation improvements, authentication configuration, CLI generator, Socket.IO integration, and performance improvements. |
+| [1.0.0](https://github.com/ZenZN99/RiserBob/releases/tag/v1.0.0) | 2026-10-22 | Initial stable release.                                                                                                    |
+
+---
+
+## Stay Updated
+
+To discover the latest RiserBob features, improvements, and changes:
+
+- **[RELEASE.md](./RELEASE.md)** — Complete details about the latest release.
+
+---
+
+**Build APIs. Stay in the Sponge Zone!** 🧽🍍
