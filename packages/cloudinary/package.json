@@ -1,0 +1,50 @@
+{
+	"name": "@riser-bob/cloudinary",
+	"version": "1.0.0",
+	"description": "A type-safe Cloudinary integration for uploading, managing, and deleting images, files, and videos in RiserBob applications",
+	"license": "MIT",
+	"author": "Zen Allaham <zenallaham09@gmail.com> (https://zenallaham.com)",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"sideEffects": false,
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json",
+		"typecheck": "tsc --noEmit",
+		"test": "bun test",
+		"prepublishOnly": "bun run typecheck && bun test && bun run build"
+	},
+	"keywords": [
+		"riser-bob",
+		"riserbob",
+		"cloudinary",
+		"image-upload",
+		"upload",
+		"images"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"cloudinary": "^2.5.1"
+	},
+	"peerDependencies": {
+		"riser-bob": "^1.1.0"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"riser-bob": "^1.1.0",
+		"typescript": "^5.6.0"
+	}
+}
