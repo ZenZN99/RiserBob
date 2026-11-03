@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Tests
+tests/
+**/*.test.ts
+**/*.spec.ts
+
+# Development
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+
+# TypeScript development
+tsconfig.tsbuildinfo
+
+# Git
+.git/
+.gitignore
+
+# Editor
+.vscode/
+.idea/
+
+# Documentation development
+docs/
