@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
     group: ci-${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
     test:
@@ -33,12 +33,29 @@ jobs:
               with:
                   bun-version: ${{ matrix.bun-version }}
 
-            - name: Install dependencies
+            - name: Install dependencies (root)
               run: bun install --frozen-lockfile
 
-            # Uncomment if the project has a tsconfig.json and TypeScript installed.
-            # - name: Type check
-            #   run: bunx tsc --noEmit
+            - name: Test (root)
+              run: bun test ./test
 
-            - name: Run tests
-              run: bun test
+            - name: Test (@riser-bob/cookie)
+              if: ${{ !cancelled() }}
+              working-directory: packages/cookie
+              run: |
+                  bun install --frozen-lockfile
+                  bun test
+
+            - name: Test (@riser-bob/jwt)
+              if: ${{ !cancelled() }}
+              working-directory: packages/jwt
+              run: |
+                  bun install --frozen-lockfile
+                  bun test
+
+            - name: Test (@riser-bob/cloudinary)
+              if: ${{ !cancelled() }}
+              working-directory: packages/cloudinary
+              run: |
+                  bun install --frozen-lockfile
+                  bun test

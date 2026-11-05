@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, test } from 'bun:test'
+import { afterAll, beforeEach, describe, expect, mock, test } from 'bun:test'
 import type { UploadApiOptions, UploadApiResponse } from 'cloudinary'
 import type { CloudinaryCredentials } from '../../src/types/config'
 import type { VideoMimeType } from '../../src/videos/types'
@@ -36,6 +36,10 @@ const validateBlobMock = mock(
 const destroyMock = mock(async () => ({
 	result: 'ok'
 }))
+
+// Capture the real validator before it is mocked, so it can be restored in afterAll.
+const realValidateBlob = (await import('../../src/shared/validate-blob'))
+	.validateBlob
 
 mock.module('../../src/shared/upload-stream', () => ({
 	uploadBlobStream: uploadBlobStreamMock
@@ -475,4 +479,10 @@ describe('VideoManager', () => {
 			).rejects.toThrow('Destroy failed')
 		})
 	})
+})
+
+afterAll(() => {
+	validateBlobMock.mockImplementation((file, rules) =>
+		realValidateBlob(file, rules)
+	)
 })
