@@ -16,7 +16,6 @@ Usage:
   riserbob --help
 
 Commands:
-  g, generate    Generate a component
   --help         Show this help message
 `)
 }
@@ -49,7 +48,9 @@ async function main(): Promise<void> {
 
 main().catch((error: unknown) => {
 	const message =
-		error instanceof Error ? error.message : 'Something went wrong.'
+		error instanceof Error
+			? error.message
+			: 'Oops! Something went wrong in the Sponge Zone. 🧽'
 
 	console.error(`🍍 RiserBob CLI: ${message}`)
 	process.exitCode = 1
