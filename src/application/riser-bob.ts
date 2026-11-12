@@ -12,154 +12,162 @@ import { Server as SocketIOServer } from 'socket.io'
 import type { ServerOptions } from 'socket.io'
 import { Server as BunSocketEngine } from '@socket.io/bun-engine'
 import type { SocketIOIntegration } from '../types/socket-io-integration'
+import { SpongRouteGroup } from '../routing/spong-group'
 
 export class RiserBob {
-	private readonly router: Router
-	private readonly middlewares: SpongMiddleware<SpongRequest>[] = []
-	private readonly errorMessages: ErrorMessages
-	private socketIO?: SocketIOIntegration
-	constructor(options: RiserBobOptions = {}) {
-		this.errorMessages = new ErrorMessages(options.funnyMode ?? true)
-		this.router = new Router(this.errorMessages)
-	}
+  private readonly router: Router
+  private readonly middlewares: SpongMiddleware<SpongRequest>[] = []
+  private readonly errorMessages: ErrorMessages
+  private socketIO?: SocketIOIntegration
+  constructor(options: RiserBobOptions = {}) {
+    this.errorMessages = new ErrorMessages(options.funnyMode ?? true)
+    this.router = new Router(this.errorMessages)
+  }
 
-	private register(
-		method: HttpMethod,
-		path: string,
-		handler: SpongHandler,
-		...middlewares: SpongMiddleware<SpongRequest>[]
-	): this {
-		if (!path.startsWith('/')) {
-			throw new Error(this.errorMessages.invalidPath(path))
-		}
+  private register(
+    method: HttpMethod,
+    path: string,
+    handler: SpongHandler,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    if (!path.startsWith('/')) {
+      throw new Error(this.errorMessages.invalidPath(path))
+    }
 
-		const pipeline = new MiddlewarePipeline<SpongRequest>()
+    const pipeline = new MiddlewarePipeline<SpongRequest>()
 
-		for (const middleware of this.middlewares) {
-			pipeline.use(middleware)
-		}
+    for (const middleware of this.middlewares) {
+      pipeline.use(middleware)
+    }
 
-		for (const middleware of middlewares) {
-			pipeline.use(middleware)
-		}
+    for (const middleware of middlewares) {
+      pipeline.use(middleware)
+    }
 
-		const wrappedHandler: SpongHandler = async (spongReq, spongRes) => {
-			return pipeline.execute(
-				spongReq,
-				spongRes,
-				async (): Promise<Response> => {
-					const result = await handler(spongReq, spongRes)
+    const wrappedHandler: SpongHandler = async (spongReq, spongRes) => {
+      return pipeline.execute(spongReq, spongRes, async (): Promise<Response> => {
+        const result = await handler(spongReq, spongRes)
 
-					if (result instanceof Response) {
-						return result
-					}
+        if (result instanceof Response) {
+          return result
+        }
 
-					console.error(
-						this.errorMessages.handlerDidNotReturnResponse()
-					)
+        console.error(this.errorMessages.handlerDidNotReturnResponse())
 
-					throw new HttpError(500, 'Handler did not send a response')
-				}
-			)
-		}
+        throw new HttpError(500, 'Handler did not send a response')
+      })
+    }
 
-		this.router.register(method, path, wrappedHandler)
+    this.router.register(method, path, wrappedHandler)
 
-		return this
-	}
+    return this
+  }
 
-	spongGet(
-		path: string,
-		handler: SpongHandler,
-		...middlewares: SpongMiddleware<SpongRequest>[]
-	): this {
-		return this.register(SpongMethod.GET, path, handler, ...middlewares)
-	}
+  spongGet(
+    path: string,
+    handler: SpongHandler,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    return this.register(SpongMethod.GET, path, handler, ...middlewares)
+  }
 
-	spongPost(
-		path: string,
-		handler: SpongHandler,
-		...middlewares: SpongMiddleware<SpongRequest>[]
-	): this {
-		return this.register(SpongMethod.POST, path, handler, ...middlewares)
-	}
+  spongPost(
+    path: string,
+    handler: SpongHandler,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    return this.register(SpongMethod.POST, path, handler, ...middlewares)
+  }
 
-	spongPut(
-		path: string,
-		handler: SpongHandler,
-		...middlewares: SpongMiddleware<SpongRequest>[]
-	): this {
-		return this.register(SpongMethod.PUT, path, handler, ...middlewares)
-	}
+  spongPut(
+    path: string,
+    handler: SpongHandler,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    return this.register(SpongMethod.PUT, path, handler, ...middlewares)
+  }
 
-	spongPatch(
-		path: string,
-		handler: SpongHandler,
-		...middlewares: SpongMiddleware<SpongRequest>[]
-	): this {
-		return this.register(SpongMethod.PATCH, path, handler, ...middlewares)
-	}
+  spongPatch(
+    path: string,
+    handler: SpongHandler,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    return this.register(SpongMethod.PATCH, path, handler, ...middlewares)
+  }
 
-	spongDelete(
-		path: string,
-		handler: SpongHandler,
-		...middlewares: SpongMiddleware<SpongRequest>[]
-	): this {
-		return this.register(SpongMethod.DELETE, path, handler, ...middlewares)
-	}
+  spongDelete(
+    path: string,
+    handler: SpongHandler,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    return this.register(SpongMethod.DELETE, path, handler, ...middlewares)
+  }
 
-	spongHead(
-		path: string,
-		handler: SpongHandler,
-		...middlewares: SpongMiddleware<SpongRequest>[]
-	): this {
-		return this.register(SpongMethod.HEAD, path, handler, ...middlewares)
-	}
+  spongHead(
+    path: string,
+    handler: SpongHandler,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    return this.register(SpongMethod.HEAD, path, handler, ...middlewares)
+  }
 
-	spongOptions(
-		path: string,
-		handler: SpongHandler,
-		...middlewares: SpongMiddleware<SpongRequest>[]
-	): this {
-		return this.register(SpongMethod.OPTIONS, path, handler, ...middlewares)
-	}
+  spongOptions(
+    path: string,
+    handler: SpongHandler,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    return this.register(SpongMethod.OPTIONS, path, handler, ...middlewares)
+  }
 
-	spongUse(middleware: SpongMiddleware<SpongRequest>): this {
-		this.middlewares.push(middleware)
-		return this
-	}
+  spongUse(middleware: SpongMiddleware<SpongRequest>): this {
+    this.middlewares.push(middleware)
+    return this
+  }
 
-	spongSocketIO(options: Partial<ServerOptions> = {}): SocketIOServer {
-		if (this.socketIO) {
-			return this.socketIO.io
-		}
+  spongSocketIO(options: Partial<ServerOptions> = {}): SocketIOServer {
+    if (this.socketIO) {
+      return this.socketIO.io
+    }
 
-		const path = options.path ?? '/socket.io/'
+    const path = options.path ?? '/socket.io/'
 
-		const engine = new BunSocketEngine({ path })
-		const io = new SocketIOServer({
-			...options,
-			path
-		})
+    const engine = new BunSocketEngine({ path })
+    const io = new SocketIOServer({
+      ...options,
+      path,
+    })
 
-		io.bind(engine)
+    io.bind(engine)
 
-		this.socketIO = {
-			io,
-			engine,
-			path
-		}
+    this.socketIO = {
+      io,
+      engine,
+      path,
+    }
 
-		return io
-	}
+    return io
+  }
 
-	spongListen(port = 4000, callback?: () => void) {
-		return HttpServer(
-			this.router,
-			this.errorMessages,
-			port,
-			callback,
-			this.socketIO
-		)
-	}
+  spongGroup(
+    prefix: string,
+    callback: (group: SpongRouteGroup) => void,
+    ...middlewares: SpongMiddleware<SpongRequest>[]
+  ): this {
+    const group = new SpongRouteGroup(
+      (method, path, handler, ...routeMiddlewares) => {
+        this.register(method, path, handler, ...routeMiddlewares)
+      },
+      prefix,
+      this.errorMessages,
+      middlewares,
+    )
+
+    callback(group)
+
+    return this
+  }
+
+  spongListen(port = 4000, callback?: () => void) {
+    return HttpServer(this.router, this.errorMessages, port, callback, this.socketIO)
+  }
 }
