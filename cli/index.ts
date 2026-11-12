@@ -1,13 +1,14 @@
 #!/usr/bin/env bun
 
 import { generateModule } from './generators/module.generator'
+import { selectService } from './utils/select'
 
 const args = process.argv.slice(2)
 
 const [command, type, name] = args
 
 function showHelp(): void {
-	console.log(`
+  console.log(`
 🧽 RiserBob CLI
 
 Usage:
@@ -21,37 +22,33 @@ Commands:
 }
 
 async function main(): Promise<void> {
-	if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
-		showHelp()
-		return
-	}
+  if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
+    showHelp()
+    return
+  }
 
-	if (args.includes('--version') || args.includes('-v')) {
-		console.log('RiserBob CLI')
-		console.log('Version is provided by the installed package.')
-		return
-	}
+  if (args.includes('--version') || args.includes('-v')) {
+    console.log('RiserBob CLI')
+    console.log('Version is provided by the installed package.')
+    return
+  }
 
-	if (
-		(command === 'g' || command === 'generate') &&
-		type === 'module' &&
-		name
-	) {
-		await generateModule(name)
-		return
-	}
+  if ((command === 'g' || command === 'generate') && type === 'module' && name) {
+    const withService = await selectService()
 
-	console.error('🧽 Oh, barnacles! Unknown command.')
-	showHelp()
-	process.exitCode = 1
+    await generateModule(name, withService)
+    return
+  }
+
+  console.error('🧽 Oh, barnacles! Unknown command.')
+  showHelp()
+  process.exitCode = 1
 }
 
 main().catch((error: unknown) => {
-	const message =
-		error instanceof Error
-			? error.message
-			: 'Oops! Something went wrong in the Sponge Zone. 🧽'
+  const message =
+    error instanceof Error ? error.message : 'Oops! Something went wrong in the Sponge Zone. 🧽'
 
-	console.error(`🍍 RiserBob CLI: ${message}`)
-	process.exitCode = 1
+  console.error(`🍍 RiserBob CLI: ${message}`)
+  process.exitCode = 1
 })
