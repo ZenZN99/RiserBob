@@ -10,7 +10,7 @@
       "devDependencies": {
         "@types/bun": "latest",
         "@types/jsonwebtoken": "^9.0.7",
-        "riser-bob": "latest",
+        "riser-bob": "^1.1.0",
         "typescript": "^5.6.0",
       },
       "peerDependencies": {
