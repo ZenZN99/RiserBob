@@ -1,6 +1,6 @@
 <h1>
   <img src="https://res.cloudinary.com/dgagbheuj/image/upload/v1792601028/riserbob/covers/keps4sy2lumzdx0ho23i.png" alt="RiserBob Logo" width="48" height="48" align="absmiddle" />
-  RiserBob V1.2.1 Latest
+  RiserBob V1.2.3 Latest
 </h1>
 
 A fun and fast framework powered by Bun and TypeScript, bringing simplicity and a fresh perspective to backend development.
