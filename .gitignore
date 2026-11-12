@@ -36,3 +36,5 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # Private TODO file
 TODO.md
 ERRORS.md
+NOTES_ERROR.md
+V1.2.0.md
