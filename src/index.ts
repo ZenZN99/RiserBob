@@ -4,6 +4,22 @@ export { RiserBob } from './application/riser-bob'
 // http errors
 export { HttpError } from './errors/http-error'
 
+// exceptions
+export {
+  SpongBadRequestException,
+  SpongUnauthorizedException,
+  SpongForbiddenException,
+  SpongNotFoundException,
+  SpongMethodNotAllowedException,
+  SpongConflictException,
+  SpongUnprocessableEntityException,
+  SpongTooManyRequestsException,
+  SpongInternalServerErrorException,
+  SpongServiceUnavailableException,
+} from './errors/exceptions/exceptions'
+
+export { isSpongHttpException } from './errors/exceptions/spong-http-exception'
+
 // Middlewares
 export { AuthMiddleware } from './middleware/auth-middleware'
 export { corsMiddleware } from './middleware/cors-middleware'
@@ -19,6 +35,12 @@ export type { SpongRequest } from './types/spong-request'
 export type { SpongResponse } from './types/spong-response'
 export type { SpongNext } from './types/spong-middleware'
 
-// validation
-export type { ValidationSchema } from './validation/validator'
-export { Validator } from './validation/validator'
+export { Validator, defineSchema, rules, passwordRules } from './validation/validator'
+export type {
+  ValidationSchema,
+  ValidationResult,
+  ValidationErrors,
+  FieldRules,
+  PasswordFieldRules,
+  SchemaFor,
+} from './validation/validator'
