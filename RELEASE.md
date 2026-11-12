@@ -1,111 +1,231 @@
 # RiserBob — Release Notes
 
-## What's New RiserBob V1.1.0
+## What's New in RiserBob v1.2.0
 
-This release expands RiserBob's validation system, authentication configuration, CLI workflow, and real-time communication support while keeping the framework's Sponge Zone personality.
+RiserBob v1.2.0 focuses on improving error handling, route organization, validation safety, CLI workflows, generated project architecture, and performance observability.
 
-## Validation Improvements
+This release makes building and maintaining backend applications with RiserBob more structured and gives developers better tools to understand framework behavior under load.
 
-### Type-aware validation rules
+---
 
-- Expanded the validation rule types to support `array`, `minItems`, and `maxItems`.
-- Added `url` validation for web URLs using `http:` and `https:`.
-- Added `enum:value1,value2,...` to restrict a field to an explicit list of allowed values.
-- Improved TypeScript schema typing so rules can be constrained by the selected field type and their order.
-- Added stricter rule-ordering expectations, including terminal rules such as `email`, `url`, `enum`, and `boolean`.
-- Prevented incompatible rule combinations, such as text-length rules on numbers or array-item rules on strings.
-- Required an array field to declare at least one of `minItems` or `maxItems`.
-- Tightened duplicate-rule checks for bounds where supported by the schema types.
+## 1. Dedicated Error Handling
 
-### Runtime validation
+Introduced a more structured approach to HTTP error handling through dedicated exception classes.
 
-- Added runtime checks for arrays and their item counts.
-- Added runtime URL validation and enum membership checks.
-- Preserved the existing validation approach and result shape, including `ValidationResult<T>` and field-based errors.
-- Continued supporting existing rules such as `required`, `nullable`, `string`, `number`, `boolean`, `email`, `confirmed`, `min`, `max`, `minLength`, and `maxLength`.
+### Highlights
 
-> TypeScript schema checks help catch invalid rule combinations while editing, while runtime validation still checks incoming data. Runtime validation remains necessary.
+- Added specific HTTP exception classes, including `SpongNotFoundException`.
+- Improved the organization and handling of HTTP errors.
+- Made it easier to represent specific HTTP error conditions.
+- Improved consistency when handling errors across framework components.
 
-## Authentication Middleware
+This approach provides developers with a clearer way to express HTTP errors without relying exclusively on generic error objects.
 
-- Improved `AuthMiddleware` configuration for cookie-based authentication.
-- When using `mode: 'cookie'`, `cookieName` is required so the middleware knows which cookie to read.
-- Kept authentication configuration explicit instead of silently guessing which cookie should contain the token.
-- Preserve the existing authentication flow and token-verification behavior when upgrading; check your current middleware options before changing configuration.
+---
 
-## CLI Improvements
+## 2. Route Groups & Nested Groups
 
-### Project creation
+Added `spongGroup()` to organize related routes into reusable groups.
 
-- Added the `create-riser-bob` project generator.
-- Generates a starter project from the bundled template.
-- Updates the generated `package.json` with the RiserBob dependency.
-- Prints next steps after creating a project.
+### Highlights
 
-Create a project with:
+- Group routes under a shared URL prefix.
+- Apply middleware at the group level.
+- Organize related endpoints together.
+- Support nested route groups.
+- Reduce repeated route configuration.
 
-```bash
-bun create riser-bob my-app
+### Example
+
+```ts
+bob.spongGroup('/api', () => {
+  bob.spongGroup('/users', () => {
+    bob.spongGet('/', getUsers)
+    bob.spongGet('/:id', getUserById)
+  })
+
+  bob.spongGroup('/posts', () => {
+    bob.spongGet('/', getPosts)
+  })
+})
 ```
 
-### Module generation
+The example illustrates the intended grouping structure. Refer to the framework's implementation and API documentation for the exact callback and middleware signatures.
 
-- Improved the CLI's module scaffolding workflow.
-- Generated modules include a controller, route, module, schema, validation-rule files, and a basic controller test.
-- Added starter `Create` and `Update` validation-rule files.
-- Organized generated files into a predictable module structure to make it easier to extend a feature.
+---
 
-Use the module generator command supported by your installed CLI version. For the previously used command format:
+## 3. Stricter Validation System
 
-```bash
-bun run riser-bob g module posts
-```
+Further strengthened RiserBob's validation system to provide more predictable and reliable validation behavior.
 
-If your project exposes `riser-bob` as a package script or binary, use the invocation documented by that project.
+### Highlights
 
-## Socket.IO Integration
+- Improved validation rule compatibility.
+- Enforced stricter validation constraints.
+- Improved handling of incompatible rule combinations.
+- Strengthened validation schema checks.
+- Improved consistency between TypeScript schema definitions and runtime validation.
+- Reduced the possibility of accidentally defining invalid validation configurations.
 
-- Added Socket.IO integration using `@socket.io/bun-engine`.
-- HTTP routes and Socket.IO can run on the same port.
-- Added support for configuring the Socket.IO server through `spongSocketIO()`.
-- Tested the local flow with an HTTP endpoint and a Socket.IO client connecting to the same server and exchanging a message.
+The goal is to make validation schemas more reliable while maintaining the existing validation API and rule names.
 
-## Funny Mode and Developer Experience
+---
 
-- Continued the Sponge Zone personality in framework responses and developer-facing messages through the `funnyMode` work.
-- Improved the overall developer experience around configuration and generated-project setup.
-- Added a Prettier configuration to the starter template.
+## 4. Improved CLI Experience
 
-Check the configuration in your installed version to confirm the exact `funnyMode` option name, default, and scope before relying on a particular message style.
+Improved the CLI module generation workflow with an interactive service selection prompt.
+
+### Highlights
+
+- The CLI now asks whether a service should be generated.
+- Developers can choose whether their generated module includes a service.
+- Avoids generating unnecessary service files when they are not needed.
+- Makes module scaffolding more flexible.
+
+This gives developers more control over the structure of generated modules.
+
+---
+
+## 5. Improved Bootstrap Project Structure
+
+Improved the default project structure generated by the bootstrap template.
+
+### Added `service` File
+
+The generated project now includes a service file to provide a dedicated place for application-level logic.
+
+### Added `modules.ts`
+
+Added a `modules.ts` file to provide a centralized location for organizing and managing application modules.
+
+### Benefits
+
+- Clearer separation of responsibilities.
+- More organized application structure.
+- Easier module registration and management.
+- A more consistent starting point for larger applications.
+
+---
+
+## 6. Performance Testing & Monitoring
+
+Improved the framework's performance evaluation workflow.
+
+### Highlights
+
+- Improved performance testing under load.
+- Added monitoring to observe framework behavior during intensive request workloads.
+- Improved performance evaluation and analysis.
+- Made it easier to investigate performance behavior during stress testing.
+
+These improvements help evaluate how RiserBob behaves under different workloads instead of relying on a single benchmark result.
+
+---
+
+## 7. Memory Monitoring
+
+Added memory usage monitoring to the performance evaluation workflow.
+
+### Highlights
+
+- Observe memory consumption during testing.
+- Monitor memory behavior under load.
+- Make resource usage easier to investigate.
+- Help identify potential memory-related issues during performance testing.
+
+Memory monitoring provides additional information when evaluating framework stability and resource consumption.
+
+---
+
+## 8. Improved Prettier Configuration
+
+Improved the `.prettierrc` configuration.
+
+### Highlights
+
+- Updated formatting configuration.
+- Improved code style consistency.
+- Provided a more consistent formatting experience across generated projects.
+
+---
+
+## 9. Developer Experience Improvements
+
+This release brings together improvements across the framework and its tooling.
+
+- More structured HTTP error handling.
+- Better route organization through nested groups.
+- Stricter validation behavior.
+- More flexible CLI generation.
+- Improved bootstrap project architecture.
+- Better performance and memory observability.
+- More consistent code formatting.
+
+---
 
 ## Getting Started
 
-Install RiserBob in a Bun project:
+Install RiserBob:
 
 ```bash
 bun add riser-bob
 ```
 
-Create a project:
+Create a new project:
 
 ```bash
 bun create riser-bob my-app
+```
+
+Navigate to your project:
+
+```bash
 cd my-app
+```
+
+Install dependencies:
+
+```bash
 bun install
+```
+
+Start the development server:
+
+```bash
 bun run dev
 ```
 
+---
+
 ## Upgrade Notes
 
-- If you enable cookie authentication with `mode: 'cookie'`, provide the required `cookieName`.
-- Review schemas that use `array`, `url`, or `enum` and ensure they follow the current rule ordering and bounds requirements.
-- Confirm that the `riser-bob` version declared by the project generator matches a version actually published on npm.
-- CLI commands can vary by how the CLI is installed or exposed in `package.json`; use the command supported by your installed version.
+When upgrading to v1.2.0, we recommend:
 
-## Verification Notes
+- Review the updated error-handling approach and available exception classes.
+- Review route organization if you plan to use `spongGroup()` and nested groups.
+- Check existing validation schemas against the stricter validation constraints.
+- Review CLI-generated modules and the new service selection prompt.
+- Familiarize yourself with the updated bootstrap structure, including `service` and `modules.ts`.
+- Review the updated Prettier configuration.
 
-- Socket.IO was tested locally with HTTP and a Socket.IO client running together.
-- Do not treat this document as confirmation that every package has been published or that every TypeScript edge case has been tested. Verify the final package contents and run the project's tests before tagging a formal release.
+Refer to the official documentation for the exact APIs and any version-specific migration requirements.
+
+---
+
+## Release Summary
+
+RiserBob v1.2.0 focuses on making the framework more structured, predictable, and easier to develop with.
+
+The release improves several important areas:
+
+- **Error Handling** — More structured HTTP exceptions.
+- **Routing** — Route groups and nested groups.
+- **Validation** — Stricter schema and rule compatibility.
+- **CLI** — More flexible module generation.
+- **Architecture** — Improved bootstrap project structure.
+- **Performance** — Better load testing and performance monitoring.
+- **Memory** — Memory usage monitoring.
+- **Formatting** — Improved Prettier configuration.
 
 ---
 
