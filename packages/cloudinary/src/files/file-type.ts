@@ -1,5 +1,5 @@
 import { startsWith } from '../shared/byte-utils'
-import { FileMimeType } from './types'
+import type { FileMimeType } from './types'
 
 /** Detects the real file type from the first bytes. ZIP also covers docx/xlsx/pptx. */
 export function detectFileType(bytes: Uint8Array): FileMimeType | null {
