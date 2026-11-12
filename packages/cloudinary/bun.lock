@@ -9,11 +9,11 @@
       },
       "devDependencies": {
         "@types/bun": "latest",
-        "riser-bob": "latest",
+        "riser-bob": "^1.1.0",
         "typescript": "^5.6.0",
       },
       "peerDependencies": {
-        "riser-bob": "*",
+        "riser-bob": "^1.1.0",
       },
     },
   },
