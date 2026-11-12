@@ -8,7 +8,7 @@ For complete release details, implementation notes, examples, and upgrade instru
 
 ---
 
-## [1.2.0] - Unreleased
+## [1.2.1] - 2026-11-13
 
 <Badge>Upcoming Release</Badge>
 
@@ -112,7 +112,7 @@ For complete release details, implementation notes, examples, and upgrade instru
 
 | Version                                                          | Date       | Highlights                                                                                                                 |
 | ---------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
-| 1.2.0                                                            | Unreleased | Error handling, nested route groups, stricter validation, CLI improvements, performance and memory monitoring.             |
+| 1.2.1                                                            | Unreleased | Error handling, nested route groups, stricter validation, CLI improvements, performance and memory monitoring.             |
 | [1.1.0](./RELEASE.md)                                            | 2026-10-30 | Validation improvements, authentication configuration, CLI generator, Socket.IO integration, and performance improvements. |
 | [1.0.0](https://github.com/ZenZN99/RiserBob/releases/tag/v1.0.0) | 2026-10-22 | Initial stable release.                                                                                                    |
 
