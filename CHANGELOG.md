@@ -8,9 +8,43 @@ For complete release details, implementation notes, examples, and upgrade instru
 
 ---
 
-## [1.1.0] - 2026-10-30
+## [1.2.0] - Unreleased
 
-<Badge>Latest Release</Badge>
+<Badge>Upcoming Release</Badge>
+
+### Added
+
+- Added dedicated HTTP error handling with specific exception classes, including `SpongNotFoundException`.
+- Added `spongGroup()` for organizing routes into route groups.
+- Added support for nested route groups.
+- Added a `service` file to the generated bootstrap project structure.
+- Added a `modules.ts` file to the generated bootstrap project structure.
+- Added an interactive CLI prompt that allows developers to choose whether to generate a service when creating a module.
+
+### Improved
+
+- Significantly strengthened the validation system with stricter rule compatibility and validation behavior.
+- Improved validation schema constraints to prevent invalid rule combinations.
+- Improved CLI project and module generation workflows.
+- Improved generated project architecture and file organization.
+- Improved the Prettier configuration (`.prettierrc`) for a more consistent development experience.
+
+### Performance & Monitoring
+
+- Improved performance testing and evaluation workflows.
+- Added performance monitoring under load to help analyze framework behavior during intensive requests.
+- Added memory usage monitoring to help observe memory consumption during testing.
+- Improved the ability to evaluate framework stability and resource usage under different workloads.
+
+### Developer Experience
+
+- Improved the generated bootstrap structure with clearer separation between modules and services.
+- Made module generation more flexible through interactive CLI configuration.
+- Improved code formatting consistency in generated projects.
+
+---
+
+## [1.1.0] - 2026-10-30
 
 ### Added
 
@@ -49,10 +83,6 @@ For complete release details, implementation notes, examples, and upgrade instru
 - Expanded documentation for validation, authentication, CLI workflows, and Socket.IO integration.
 - Added release documentation and usage examples.
 
-### Release Details
-
-For the complete list of features, technical changes, examples, upgrade instructions, and verification notes, see:
-
 **[Read the RiserBob v1.1.0 Release Notes →](./RELEASE.md)**
 
 ---
@@ -82,6 +112,7 @@ For the complete list of features, technical changes, examples, upgrade instruct
 
 | Version                                                          | Date       | Highlights                                                                                                                 |
 | ---------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| 1.2.0                                                            | Unreleased | Error handling, nested route groups, stricter validation, CLI improvements, performance and memory monitoring.             |
 | [1.1.0](./RELEASE.md)                                            | 2026-10-30 | Validation improvements, authentication configuration, CLI generator, Socket.IO integration, and performance improvements. |
 | [1.0.0](https://github.com/ZenZN99/RiserBob/releases/tag/v1.0.0) | 2026-10-22 | Initial stable release.                                                                                                    |
 
