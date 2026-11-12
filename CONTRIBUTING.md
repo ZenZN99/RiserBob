@@ -2,7 +2,7 @@
 
 Thank you for your interest in improving RiserBob! This guide explains how to report issues, propose changes, and submit code.
 
-Please read the [Code of Conduct](CODE_OF_CONDUCT.md) before participating, and **read the [License and Contributions](#license-and-contributions) section carefully**. RiserBob is distributed under a proprietary license, which affects how contributions work.
+Please read the [Code of Conduct](CODE_OF_CONDUCT.md) before participating, and **read the [License and Contributions](#license-and-contributions) section carefully**. RiserBob is distributed under the MIT License, which allows open-source contributions and redistribution under its license terms.
 
 ## Ways to Contribute
 
@@ -97,17 +97,21 @@ Update auth middleware to throw HttpError
 
 ## License and Contributions
 
-RiserBob is released under the **RiserBob Proprietary License**. Under that license, modifying, redistributing, or creating derivative versions of RiserBob is prohibited without written permission from the copyright holder. To keep contributing possible within those terms:
+RiserBob is released under the **MIT License**.
 
-1. **Limited permission for contributors.** The copyright holder grants you permission to make a private copy or fork of the repository **solely for the purpose of preparing and submitting contributions** to the official project. This permission does not allow you to publish, distribute, or use the modified copy for any other purpose.
-2. **Your contribution grant.** By submitting a contribution (code, tests, documentation, or other material), you:
-    - confirm that you wrote it, or have the right to submit it;
-    - grant the copyright holder a perpetual, worldwide, irrevocable, royalty-free license to use, modify, reproduce, distribute, sublicense, and relicense your contribution as part of RiserBob, under the RiserBob Proprietary License or any other license the copyright holder chooses;
-    - understand that you receive no ownership of RiserBob itself as a result of contributing.
-3. **No obligation to accept.** Submitting a contribution does not guarantee it will be merged.
-4. **Other permissions.** Anything beyond the above (for example, publishing your own fork) requires prior written permission from the copyright holder, as described in the license.
+By contributing to RiserBob, you agree that:
 
-Your own applications built with RiserBob remain yours, as stated in the license.
+1. **Your contributions are voluntary.** You retain the copyright to your original contributions.
+2. **MIT licensing.** By submitting a contribution to the official RiserBob repository, you agree that your contribution will be distributed as part of RiserBob under the project's MIT License.
+3. **Contribution rights.** You confirm that you have the legal right to submit the code, tests, documentation, or other materials you contribute.
+4. **No guarantee of acceptance.** Submitting a contribution does not guarantee that it will be reviewed, accepted, or merged.
+5. **Third-party materials.** Do not submit code or materials that you do not have permission to contribute under the MIT License.
+
+Contributors retain the copyright to their original work while allowing it to be used, modified, and redistributed under the MIT License as part of RiserBob.
+
+Your own applications built with RiserBob remain yours. The MIT License does not require you to open-source your applications simply because they use RiserBob.
+
+For the complete license terms, see the [LICENSE](LICENSE) file.
 
 ## Questions
 
