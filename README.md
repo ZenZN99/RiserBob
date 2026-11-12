@@ -1,6 +1,6 @@
 <h1>
   <img src="https://res.cloudinary.com/dgagbheuj/image/upload/v1792601028/riserbob/covers/keps4sy2lumzdx0ho23i.png" alt="RiserBob Logo" width="48" height="48" align="absmiddle" />
-  RiserBob
+  RiserBob V1.2.0 Latest
 </h1>
 
 A fun and fast framework powered by Bun and TypeScript, bringing simplicity and a fresh perspective to backend development.
@@ -24,6 +24,7 @@ Stay in the Sponge Zone!
 Requires [Bun](https://bun.sh) 1.3 or newer. There are two ways to start.
 
 ### 1. Starter template (recommended)
+
 ```bash
 bun create riser-bob my-app
 ```
@@ -31,26 +32,27 @@ bun create riser-bob my-app
 The best choice if you want a ready-made, organized template to start your project with. It creates `src/index.ts`:
 
 ```ts
-import { RiserBob } from "riser-bob";
-import { UsersModule } from "./modules/users/users.module";
+import { RiserBob } from 'riser-bob'
+import { Modules } from './modules'
 
 async function bootstrap() {
-  const bob = new RiserBob();
-  bob.spongGet("/", async (spongReq, spongRes) => {
-    return spongRes.json({
-      message: "Welcome to Bikini Bottom! 🍍",
-    });
-  });
-  new UsersModule().register(bob);
+  const bob = new RiserBob()
+
+  bob.spongGet('/', async (spongReq, spongRes) => {
+    return spongRes.send('Welcome to Bikini Bottom! 🍍')
+  })
+
+  Modules(bob)
+
   bob.spongListen(4000, () => {
-    console.log("🧽 RiserBob is running at http://localhost:4000 🍍");
-  });
+    console.log('🧽 RiserBob is running at http://localhost:4000 🍍')
+  })
 }
 
 bootstrap().catch((error: unknown) => {
-  console.error("[RiserBob] Failed to start application:", error);
-  process.exit(1);
-});
+  console.error('[RiserBob] Failed to start application:', error)
+  process.exit(1)
+})
 ```
 
 Then the terminal shows:
@@ -67,6 +69,7 @@ Then the terminal shows:
 ```
 
 ### 2. Start from scratch
+
 RiserBob doesn't force anything on you. Run `bun init`, then `bun add riser-bob`. Just remember that you'll need to build the server entry file yourself (like the one above).
 
 ## Simple API, Powerful Structure
@@ -80,11 +83,13 @@ Generate a complete module (`users.controller.ts`, `users.route.ts`, `users.modu
 ```bash
 bun run riser-bob g module users   # `generate` also works
 ```
+
 ## Learn more
 
-Docs and examples: **[riserbob.vercel.app](https://riserbob.vercel.app)**. Contributions are welcome ([CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)); report vulnerabilities privately ([SECURITY.md](SECURITY.md)).
+Docs and examples: **[riserbob.com](https://riserbob.com)**. Contributions are welcome ([CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)); report vulnerabilities privately ([SECURITY.md](SECURITY.md)).
 
 ## License
+
 RiserBob is released under the **MIT License**. See [LICENSE](LICENSE). Copyright (c) 2026 Zen Allaham — RiserBob
 
 <p align="center">
