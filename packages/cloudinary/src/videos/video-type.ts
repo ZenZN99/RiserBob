@@ -1,5 +1,5 @@
 import { startsWith } from '../shared/byte-utils'
-import { VideoMimeType } from './types'
+import type { VideoMimeType } from './types'
 
 /** Detects the real video type from the first bytes. */
 export function detectVideoType(bytes: Uint8Array): VideoMimeType | null {
