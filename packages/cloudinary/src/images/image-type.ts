@@ -1,5 +1,5 @@
 import { startsWith } from '../shared/byte-utils'
-import { ImageMimeType } from './types'
+import type { ImageMimeType } from './types'
 
 /**
  * Detects the real image type from the file's first bytes.
