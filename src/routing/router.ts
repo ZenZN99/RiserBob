@@ -2,120 +2,174 @@ import type { ErrorMessages } from '../errors/errors-messages'
 import type { SpongHandler } from '../types/spong-handler'
 import { SpongMethod, type HttpMethod } from '../types/spong-method'
 
+interface DynamicRoute {
+  path: string
+  handler: SpongHandler
+  parts: string[]
+}
+
 export class Router {
-	private routes = new Map<string, SpongHandler>()
+  private routes = new Map<string, SpongHandler>()
 
-	constructor(private readonly errorMessages: ErrorMessages) {}
+  private staticRoutes = new Map<string, SpongHandler>()
 
-	register(method: HttpMethod, path: string, handler: SpongHandler): this {
-		const key = `${method} ${path}`
+  private dynamicRoutes = new Map<string, DynamicRoute[]>()
 
-		if (this.routes.has(key)) {
-			throw new Error(this.errorMessages.duplicateRoute(key))
-		}
+  constructor(private readonly errorMessages: ErrorMessages) {}
 
-		this.routes.set(key, handler)
-		return this
-	}
+  private normalizePath(path: string): string {
+    const parts = path.split('/').filter(Boolean)
+    return '/' + parts.join('/')
+  }
 
-	private matchPath(
-		routePath: string,
-		requestPath: string
-	): Record<string, string> | undefined {
-		const routeParts = routePath.split('/').filter(Boolean)
-		const requestParts = requestPath.split('/').filter(Boolean)
+  register(method: HttpMethod, path: string, handler: SpongHandler): this {
+    const normalizedPath = this.normalizePath(path)
+    const key = `${method} ${normalizedPath}`
 
-		if (routeParts.length !== requestParts.length) {
-			return undefined
-		}
+    if (this.routes.has(key)) {
+      throw new Error(this.errorMessages.duplicateRoute(key))
+    }
 
-		const params: Record<string, string> = {}
+    this.routes.set(key, handler)
 
-		for (let i = 0; i < routeParts.length; i++) {
-			const routePart = routeParts[i]
-			const requestPart = requestParts[i]
+    if (!path.includes(':')) {
+      this.staticRoutes.set(key, handler)
+      return this
+    }
 
-			if (!routePart || !requestPart) {
-				return undefined
-			}
+    let routes = this.dynamicRoutes.get(method)
 
-			if (routePart.startsWith(':')) {
-				const paramName = routePart.slice(1)
+    if (!routes) {
+      routes = []
+      this.dynamicRoutes.set(method, routes)
+    }
 
-				if (!paramName) {
-					return undefined
-				}
+    routes.push({
+      path: normalizedPath,
+      handler,
+      parts: normalizedPath.split('/').filter(Boolean),
+    })
 
-				try {
-					params[paramName] = decodeURIComponent(requestPart)
-				} catch {
-					return undefined
-				}
-			} else if (routePart !== requestPart) {
-				return undefined
-			}
-		}
+    routes.sort((a, b) => this.compareRoutes(a.path, b.path))
 
-		return params
-	}
+    return this
+  }
 
-	private compareRoutes(aPath: string, bPath: string): number {
-		const a = aPath.split('/').filter(Boolean)
-		const b = bPath.split('/').filter(Boolean)
+  private matchPath(
+    routeParts: string[],
+    requestParts: string[],
+  ): Record<string, string> | undefined {
+    if (routeParts.length !== requestParts.length) {
+      return undefined
+    }
 
-		const length = Math.min(a.length, b.length)
+    let params: Record<string, string> | undefined
 
-		for (let i = 0; i < length; i++) {
-			const aDynamic = a[i]!.startsWith(':')
-			const bDynamic = b[i]!.startsWith(':')
+    for (let i = 0; i < routeParts.length; i++) {
+      const routePart = routeParts[i]
+      const requestPart = requestParts[i]
 
-			if (aDynamic !== bDynamic) {
-				return Number(aDynamic) - Number(bDynamic)
-			}
-		}
+      if (!routePart || !requestPart) {
+        return undefined
+      }
 
-		return b.length - a.length
-	}
+      if (routePart.startsWith(':')) {
+        const paramName = routePart.slice(1)
 
-	match(
-		method: string,
-		path: string
-	):
-		| {
-				handler: SpongHandler
-				params: Record<string, string>
-		  }
-		| undefined {
-		const entries = [...this.routes.entries()]
-			.filter(([key]) => key.startsWith(`${method} `))
-			.sort(([a], [b]) => {
-				const aPath = a.slice(method.length + 1)
-				const bPath = b.slice(method.length + 1)
+        if (!paramName) {
+          return undefined
+        }
 
-				return this.compareRoutes(aPath, bPath)
-			})
+        let decoded: string
 
-		for (const [key, handler] of entries) {
-			const routePath = key.slice(method.length + 1)
-			const params = this.matchPath(routePath, path)
+        try {
+          decoded = decodeURIComponent(requestPart)
+        } catch {
+          return undefined
+        }
 
-			if (params !== undefined) {
-				return { handler, params }
-			}
-		}
+        if (!params) params = {}
 
-		return undefined
-	}
+        params[paramName] = decoded
+      } else if (routePart !== requestPart) {
+        return undefined
+      }
+    }
 
-	allowedMethods(path: string): HttpMethod[] {
-		const methods: HttpMethod[] = [
-			SpongMethod.GET,
-			SpongMethod.POST,
-			SpongMethod.PUT,
-			SpongMethod.PATCH,
-			SpongMethod.DELETE
-		]
+    return params ?? {}
+  }
 
-		return methods.filter((method) => this.routes.has(`${method} ${path}`))
-	}
+  private compareRoutes(aPath: string, bPath: string): number {
+    const a = aPath.split('/').filter(Boolean)
+    const b = bPath.split('/').filter(Boolean)
+
+    const length = Math.min(a.length, b.length)
+
+    for (let i = 0; i < length; i++) {
+      const aDynamic = a[i]!.startsWith(':')
+      const bDynamic = b[i]!.startsWith(':')
+
+      if (aDynamic !== bDynamic) {
+        return Number(aDynamic) - Number(bDynamic)
+      }
+    }
+
+    return b.length - a.length
+  }
+
+  match(
+    method: string,
+    path: string,
+  ):
+    | {
+        handler: SpongHandler
+        params: Record<string, string>
+      }
+    | undefined {
+    const staticHandler =
+      this.staticRoutes.get(`${method} ${path}`) ??
+      this.staticRoutes.get(`${method} ${this.normalizePath(path)}`)
+
+    if (staticHandler) {
+      return {
+        handler: staticHandler,
+        params: {},
+      }
+    }
+
+    const routes = this.dynamicRoutes.get(method)
+
+    if (!routes || routes.length === 0) {
+      return undefined
+    }
+
+    const requestParts = path.split('/').filter(Boolean)
+
+    for (const route of routes) {
+      const params = this.matchPath(route.parts, requestParts)
+
+      if (params !== undefined) {
+        return {
+          handler: route.handler,
+          params,
+        }
+      }
+    }
+
+    return undefined
+  }
+
+  allowedMethods(path: string): HttpMethod[] {
+    const methods: HttpMethod[] = [
+      SpongMethod.GET,
+      SpongMethod.POST,
+      SpongMethod.PUT,
+      SpongMethod.PATCH,
+      SpongMethod.DELETE,
+    ]
+
+    const normalizedPath = this.normalizePath(path)
+
+    return methods.filter((method) => this.routes.has(`${method} ${normalizedPath}`))
+  }
 }
