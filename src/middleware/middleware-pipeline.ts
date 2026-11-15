@@ -3,42 +3,46 @@ import type { SpongMiddleware, SpongNext } from '../types/spong-middleware'
 import type { SpongResponse } from '../types/spong-response'
 
 export class MiddlewarePipeline<Context = unknown> {
-	private readonly middlewares: SpongMiddleware<Context>[] = []
+  private readonly middlewares: SpongMiddleware<Context>[] = []
 
-	constructor(
-		private readonly errorMessages: ErrorMessages = new ErrorMessages()
-	) {}
+  constructor(private readonly errorMessages: ErrorMessages = new ErrorMessages()) {}
 
-	use(middleware: SpongMiddleware<Context>): this {
-		this.middlewares.push(middleware)
-		return this
-	}
+  use(middleware: SpongMiddleware<Context>): this {
+    this.middlewares.push(middleware)
+    return this
+  }
 
-	async execute(
-		context: Context,
-		spongRes: SpongResponse,
-		finalHandler: SpongNext
-	): Promise<Response> {
-		let index = -1
+  async execute(
+    context: Context,
+    spongRes: SpongResponse,
+    finalHandler: SpongNext,
+  ): Promise<Response> {
+    const middlewares = this.middlewares
+    const length = middlewares.length
 
-		const dispatch = async (currentIndex: number): Promise<Response> => {
-			if (currentIndex <= index) {
-				throw new Error(this.errorMessages.nextCalledMultipleTimes())
-			}
+    // Fast path: no middleware registered.
+    if (length === 0) {
+      return finalHandler()
+    }
 
-			index = currentIndex
+    let index = -1
 
-			const middleware = this.middlewares[currentIndex]
+    const dispatch = async (currentIndex: number): Promise<Response> => {
+      if (currentIndex <= index) {
+        throw new Error(this.errorMessages.nextCalledMultipleTimes())
+      }
 
-			if (!middleware) {
-				return finalHandler()
-			}
+      index = currentIndex
 
-			return middleware(context, spongRes, () =>
-				dispatch(currentIndex + 1)
-			)
-		}
+      if (currentIndex >= length) {
+        return finalHandler()
+      }
 
-		return dispatch(0)
-	}
+      const middleware = middlewares[currentIndex]!
+
+      return middleware(context, spongRes, () => dispatch(currentIndex + 1))
+    }
+
+    return dispatch(0)
+  }
 }
