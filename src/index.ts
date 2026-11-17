@@ -34,6 +34,7 @@ export type { SpongMiddleware } from './types/spong-middleware'
 export type { SpongRequest } from './types/spong-request'
 export type { SpongResponse } from './types/spong-response'
 export type { SpongNext } from './types/spong-middleware'
+export type { RegisteredRoute } from './types/registered-route'
 
 export { Validator, defineSchema, rules, passwordRules } from './validation/validator'
 export type {
