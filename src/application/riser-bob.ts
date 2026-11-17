@@ -13,6 +13,7 @@ import type { ServerOptions } from 'socket.io'
 import { Server as BunSocketEngine } from '@socket.io/bun-engine'
 import type { SocketIOIntegration } from '../types/socket-io-integration'
 import { SpongRouteGroup } from '../routing/spong-group'
+import type { RegisteredRoute } from '../types/registered-route'
 
 export class RiserBob {
   private readonly router: Router
@@ -117,6 +118,10 @@ export class RiserBob {
     ...middlewares: SpongMiddleware<SpongRequest>[]
   ): this {
     return this.register(SpongMethod.OPTIONS, path, handler, ...middlewares)
+  }
+
+  spongRoutes(): readonly RegisteredRoute[] {
+    return this.router.list()
   }
 
   spongUse(middleware: SpongMiddleware<SpongRequest>): this {
