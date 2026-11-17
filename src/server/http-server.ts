@@ -15,7 +15,7 @@ const utf8Decoder = new TextDecoder()
 export const HttpServer = (
   router: Router,
   errorMessages: ErrorMessages,
-  port: number = 3000,
+  port: number = 4000,
   callback?: () => void,
   socketIO?: SocketIOIntegration,
 ) => {
@@ -45,7 +45,7 @@ export const HttpServer = (
           if (origin) {
             headers.set('Access-Control-Allow-Origin', origin)
             headers.set('Access-Control-Allow-Credentials', 'true')
-            headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+            headers.set('Access-Control-Allow-Methods', 'GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS')
             headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
             headers.set('Access-Control-Max-Age', '86400')
             headers.set('Vary', 'Origin')
