@@ -205,7 +205,7 @@ describe('HttpServer', () => {
       expect(response.headers.get('Access-Control-Allow-Origin')).toBe('https://example.com')
       expect(response.headers.get('Access-Control-Allow-Credentials')).toBe('true')
       expect(response.headers.get('Access-Control-Allow-Methods')).toBe(
-        'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        'GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS',
       )
       expect(response.headers.get('Access-Control-Allow-Headers')).toBe(
         'Content-Type, Authorization',
