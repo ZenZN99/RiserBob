@@ -39,7 +39,7 @@ Note: the source folder is `src/middleware/`, but its unit tests live in `test/u
 - Public API members use the `Sponge` prefix (`spongGet`, `spongUse`, `SpongRequest`, ...). Follow the existing naming.
 - Handler parameters are named `spongReq` and `spongRes`, never `req` and `res`.
 - Keep the project's fun tone in user-facing log and error messages (SpongeBob theme), and keep messages consistent with the existing ones.
-- Do not add dependencies without asking first.
+- Do not add dependencies without asking first. Any new dependency must have a license compatible with MIT.
 
 ## Architecture Rules
 
@@ -65,7 +65,7 @@ When you change public behavior, update `README.md` and any affected tests in th
 
 ## License
 
-RiserBob is proprietary (see `LICENSE`). Do not copy the framework's code into other projects, do not suggest redistributing or publishing modified copies, and do not change the license or copyright notices.
+RiserBob is released under the MIT License (see `LICENSE`). Keep the copyright notice and the MIT permission notice in all copies or substantial portions of the code. Do not remove or alter them, and do not change the license of the project. Code you contribute is licensed under the same MIT terms.
 
 ## Contributions
 
