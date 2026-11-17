@@ -1,4 +1,5 @@
 import type { ErrorMessages } from '../errors/errors-messages'
+import type { RegisteredRoute } from '../types/registered-route'
 import type { SpongHandler } from '../types/spong-handler'
 import { SpongMethod, type HttpMethod } from '../types/spong-method'
 
@@ -117,6 +118,19 @@ export class Router {
     return b.length - a.length
   }
 
+  list(): readonly RegisteredRoute[] {
+    return Object.freeze(
+      Array.from(this.routes.keys(), (key) => {
+        const separator = key.indexOf(' ')
+
+        return Object.freeze({
+          method: key.slice(0, separator) as HttpMethod,
+          path: key.slice(separator + 1),
+        })
+      }),
+    )
+  }
+
   match(
     method: string,
     path: string,
@@ -162,10 +176,12 @@ export class Router {
   allowedMethods(path: string): HttpMethod[] {
     const methods: HttpMethod[] = [
       SpongMethod.GET,
+      SpongMethod.HEAD,
       SpongMethod.POST,
       SpongMethod.PUT,
       SpongMethod.PATCH,
       SpongMethod.DELETE,
+      SpongMethod.OPTIONS,
     ]
 
     const normalizedPath = this.normalizePath(path)
